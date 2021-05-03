@@ -11,6 +11,9 @@
 		E97A125C263FC01D00034B3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97A125B263FC01D00034B3F /* ContentView.swift */; };
 		E97A125E263FC01E00034B3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E97A125D263FC01E00034B3F /* Assets.xcassets */; };
 		E97A1261263FC01E00034B3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E97A1260263FC01E00034B3F /* Preview Assets.xcassets */; };
+		E97A126A263FC2E000034B3F /* EmojiArtDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97A1269263FC2E000034B3F /* EmojiArtDocument.swift */; };
+		E97A126D263FC6F800034B3F /* EmojiArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97A126C263FC6F800034B3F /* EmojiArt.swift */; };
+		E97A1270263FD01800034B3F /* EmojiArtExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97A126F263FD01800034B3F /* EmojiArtExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +23,9 @@
 		E97A125D263FC01E00034B3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E97A1260263FC01E00034B3F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E97A1262263FC01E00034B3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E97A1269263FC2E000034B3F /* EmojiArtDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiArtDocument.swift; sourceTree = "<group>"; };
+		E97A126C263FC6F800034B3F /* EmojiArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiArt.swift; sourceTree = "<group>"; };
+		E97A126F263FD01800034B3F /* EmojiArtExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmojiArtExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +59,10 @@
 			isa = PBXGroup;
 			children = (
 				E97A1259263FC01D00034B3F /* EmojiArtApp.swift */,
-				E97A125B263FC01D00034B3F /* ContentView.swift */,
+				E97A1278263FD05000034B3F /* View */,
+				E97A1274263FD03A00034B3F /* ViewModel */,
+				E97A1276263FD04A00034B3F /* Model */,
+				E97A1272263FD02700034B3F /* Helper */,
 				E97A125D263FC01E00034B3F /* Assets.xcassets */,
 				E97A1262263FC01E00034B3F /* Info.plist */,
 				E97A125F263FC01E00034B3F /* Preview Content */,
@@ -67,6 +76,38 @@
 				E97A1260263FC01E00034B3F /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		E97A1272263FD02700034B3F /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				E97A126F263FD01800034B3F /* EmojiArtExtensions.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		E97A1274263FD03A00034B3F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				E97A1269263FC2E000034B3F /* EmojiArtDocument.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		E97A1276263FD04A00034B3F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E97A126C263FC6F800034B3F /* EmojiArt.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		E97A1278263FD05000034B3F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				E97A125B263FC01D00034B3F /* ContentView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +179,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E97A126D263FC6F800034B3F /* EmojiArt.swift in Sources */,
+				E97A1270263FD01800034B3F /* EmojiArtExtensions.swift in Sources */,
 				E97A125C263FC01D00034B3F /* ContentView.swift in Sources */,
+				E97A126A263FC2E000034B3F /* EmojiArtDocument.swift in Sources */,
 				E97A125A263FC01D00034B3F /* EmojiArtApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
