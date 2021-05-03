@@ -8,14 +8,16 @@
 import SwiftUI
 
 class EmojiArtDocument: ObservableObject {
-    
     static let palette = "🚴🏻‍♂️🤺📔🗻🪂🏂🃏👨🏻‍💻📚"
-    
     @Published private var model: EmojiArt = EmojiArt()
     
     
-    // MARK: - Intents
+    // MARK: - Acces to the model
+    @Published private(set) var backgroundImage: UIImage?
+    var emojis: [EmojiArt.Emoji] { model.emojis }
     
+    
+    // MARK: - Intents
     func addEmoji(_ text: String, at location: CGPoint, size: CGFloat) {
         model.addEmoji(text, x: Int(location.x), y: Int(location.y), size: Int(size))
     }
@@ -35,5 +37,27 @@ class EmojiArtDocument: ObservableObject {
     
     func setBackground(_ url: URL?) {
         model.backgroundURL = url?.imageURL
+        fetchBackgroundImage()
+    }
+    
+    private func fetchBackgroundImage() {
+        backgroundImage = nil
+        guard let url = model.backgroundURL else { return }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let imageData = try? Data(contentsOf: url) else { return }
+            
+            DispatchQueue.main.async {
+                guard url == self.model.backgroundURL else { return }
+                self.backgroundImage = UIImage(data: imageData)
+            }
+        }
     }
 }
+
+
+extension EmojiArt.Emoji {
+    var fontSize: CGFloat { CGFloat(self.size) }
+    var location: CGPoint { CGPoint(x: CGFloat(self.x), y: CGFloat(self.y)) }
+}
+

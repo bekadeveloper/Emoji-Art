@@ -19,9 +19,16 @@ struct EmojiArt {
         var x: Int
         var y: Int
         var size: Int
+        
+        fileprivate init(_ text: String, x: Int, y: Int, size: Int) {
+            self.text = text
+            self.x = x
+            self.y = y
+            self.size = size
+        }
     }
     
     mutating func addEmoji(_ text: String, x: Int, y: Int, size: Int) {
-        emojis.append(Emoji(text: text, x: x, y: y, size: size))
+        emojis.append(Emoji(text, x: x, y: y, size: size))
     }
 }
