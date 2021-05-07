@@ -10,6 +10,8 @@ import SwiftUI
 class EmojiArtDocument: ObservableObject {
     static let palette = "🚴🏻‍♂️🤺📔🗻🪂🏂🃏👨🏻‍💻📚"
     
+    
+    // MARK: - Acces to the model
     @Published private var model: EmojiArt {
         didSet {
             UserDefaults.standard.setValue(model.json, forKey: "EmojiArtDocument.Untitled")
@@ -21,7 +23,6 @@ class EmojiArtDocument: ObservableObject {
         fetchBackgroundImage()
     }
     
-    // MARK: - Acces to the model
     @Published private(set) var backgroundImage: UIImage?
     var emojis: [EmojiArt.Emoji] { model.emojis }
     
@@ -61,6 +62,11 @@ class EmojiArtDocument: ObservableObject {
                 self.backgroundImage = UIImage(data: imageData)
             }
         }
+    }
+    
+    func clearDocument() {
+        model = EmojiArt()
+        backgroundImage = nil
     }
 }
 

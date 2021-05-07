@@ -8,17 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var viewModel: EmojiArtDocument
+    @StateObject var viewModel: EmojiArtDocument
     
     var body: some View {
         VStack {
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(EmojiArtDocument.palette.map({ String($0) }), id: \.self) { emoji in
-                        Text(emoji)
-                            .font(.system(size: defaultEmojiSize))
-                            .onDrag { NSItemProvider(object: emoji as NSString) }
+            HStack {
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(EmojiArtDocument.palette.map({ String($0) }), id: \.self) { emoji in
+                            Text(emoji)
+                                .font(.system(size: defaultEmojiSize))
+                                .onDrag { NSItemProvider(object: emoji as NSString) }
+                        }
                     }
+                }
+                
+                Button(action: viewModel.clearDocument) {
+                    Text("Clear")
+                        .bold()
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(7)
                 }
             }
             .padding(.horizontal)
@@ -26,43 +37,56 @@ struct ContentView: View {
             GeometryReader { geometry in
                 ZStack {
                     Color.white
-                        .edgesIgnoringSafeArea(.bottom)
                         .overlay(
-                            Group {
-                                if let uiImage = viewModel.backgroundImage {
-                                    Image(uiImage: uiImage)
-                                }
-                            }
+                            OptionalImage(uiImage: viewModel.backgroundImage)
+                                .scaleEffect(zoomScale)
                         )
-                        .onDrop(of: ["public.image", "public.text"], isTargeted: nil) { providers, location in
-                            let location = geometry.convert(location, from: .global)
-                            
-                            // MARK:    Why we need to change coordinate system... no idea...
-//                            location = CGPoint(x: location.x - geometry.size.width/2, y: location.y - geometry.size.height/2)
-                            
-                            return drop(providers, at: location)
+                        .onTapGesture(count: 2) {
+                            withAnimation {
+                                zoomToFit(viewModel.backgroundImage, in: geometry.size)
+                            }
                         }
-                        
                     
                     ForEach(viewModel.emojis) { emoji in
                         Text(emoji.text)
-                            .font(font(for: emoji))
-                            .position(emoji.location)
+                            .font(animatableWithSize: emoji.fontSize * zoomScale)
+                            .position(position(for: emoji, in: geometry.size))
                     }
+                }
+                .clipped()
+                .edgesIgnoringSafeArea([.horizontal, .bottom])
+                .onDrop(of: ["public.image", "public.text"], isTargeted: nil) { providers, location in
+                    var location = geometry.convert(location, from: .global)
+                    
+                    // MARK:    Why we need to change coordinate system... no idea...
+                    location = CGPoint(x: location.x - geometry.size.width/2, y: location.y - geometry.size.height/2)
+                    location = CGPoint(x: location.x / zoomScale, y: location.y / zoomScale)
+                    
+                    return drop(providers, at: location)
                 }
             }
         }
     }
     
+    @State private var zoomScale: CGFloat = 1
     
-    private func font(for emoji: EmojiArt.Emoji) -> Font {
-        Font.system(size: emoji.fontSize)
+    private func zoomToFit(_ image: UIImage?, in size: CGSize) {
+        guard image != nil else { return }
+        guard image!.size.width > 0, image!.size.height > 0 else { return }
+        
+        let hZoom = size.width / image!.size.width
+        let vZoom = size.height / image!.size.height
+        zoomScale = min(hZoom, vZoom)
+        
     }
     
     private func position(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
-        
         // MARK:    Why we need to change coordinate system... no idea...
-        CGPoint(x: emoji.location.x + size.width/2, y: emoji.location.y + size.height/2)
+        var location = emoji.location
+        location = CGPoint(x: location.x * zoomScale, y: location.y * zoomScale)
+        location = CGPoint(x: location.x + size.width/2, y: location.y + size.height/2)
+        
+        return location
     }
     
     private func drop(_ providers: [NSItemProvider], at location: CGPoint) -> Bool {
@@ -93,3 +117,6 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(viewModel: EmojiArtDocument())
     }
 }
+
+
+
