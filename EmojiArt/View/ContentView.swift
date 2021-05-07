@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var viewModel: EmojiArtDocument
+    @ObservedObject var viewModel: EmojiArtDocument
     
     var body: some View {
         VStack {
@@ -40,12 +40,9 @@ struct ContentView: View {
                         .overlay(
                             OptionalImage(uiImage: viewModel.backgroundImage)
                                 .scaleEffect(zoomScale)
+                                .offset(panOffset)
                         )
-                        .onTapGesture(count: 2) {
-                            withAnimation {
-                                zoomToFit(viewModel.backgroundImage, in: geometry.size)
-                            }
-                        }
+                        .gesture(doubleTapToZoom(in: geometry.size))
                     
                     ForEach(viewModel.emojis) { emoji in
                         Text(emoji.text)
@@ -54,12 +51,15 @@ struct ContentView: View {
                     }
                 }
                 .clipped()
+                .gesture(zoomGesture())
+                .gesture(panGesture())
                 .edgesIgnoringSafeArea([.horizontal, .bottom])
                 .onDrop(of: ["public.image", "public.text"], isTargeted: nil) { providers, location in
-                    var location = geometry.convert(location, from: .global)
+                    var location = CGPoint(x: location.x, y: geometry.convert(location, from: .global).y)
                     
                     // MARK:    Why we need to change coordinate system... no idea...
                     location = CGPoint(x: location.x - geometry.size.width/2, y: location.y - geometry.size.height/2)
+                    location = CGPoint(x: location.x - panOffset.width, y: location.y - panOffset.height)
                     location = CGPoint(x: location.x / zoomScale, y: location.y / zoomScale)
                     
                     return drop(providers, at: location)
@@ -68,16 +68,56 @@ struct ContentView: View {
         }
     }
     
-    @State private var zoomScale: CGFloat = 1
+    @State private var steadyStateZoomScale: CGFloat = 1.0
+    @GestureState private var gestureZoomScale: CGFloat = 1.0
+    
+    private var zoomScale: CGFloat {
+        return steadyStateZoomScale * gestureZoomScale
+    }
+    
+    private func zoomGesture() -> some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoomScale) { latestGestureScale, gestureZoomScale, transaction in
+                gestureZoomScale = latestGestureScale
+            }
+            .onEnded { finalGestureScale in
+                steadyStateZoomScale *= finalGestureScale
+            }
+    }
+    
+    @State private var steadyStatePanOffset: CGSize = .zero
+    @GestureState private var gesturePanOffset: CGSize = .zero
+    
+    private var panOffset: CGSize {
+        return (steadyStatePanOffset + gesturePanOffset) * zoomScale
+    }
+    
+    private func panGesture() -> some Gesture {
+        DragGesture()
+            .updating($gesturePanOffset) { latestDragGestureValue, gesturePanOffset, transaction in
+                gesturePanOffset = latestDragGestureValue.translation / zoomScale
+            }
+            .onEnded { finalDragGestureValue in
+                steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
+            }
+    }
+    
+    private func doubleTapToZoom(in size: CGSize) -> some Gesture {
+        TapGesture(count: 2)
+            .onEnded {
+                withAnimation {
+                    zoomToFit(viewModel.backgroundImage, in: size)
+                }
+            }
+    }
     
     private func zoomToFit(_ image: UIImage?, in size: CGSize) {
-        guard image != nil else { return }
-        guard image!.size.width > 0, image!.size.height > 0 else { return }
-        
-        let hZoom = size.width / image!.size.width
-        let vZoom = size.height / image!.size.height
-        zoomScale = min(hZoom, vZoom)
-        
+        if let image = image, image.size.width > 0, image.size.height > 0 {
+            let hZoom = size.width / image.size.width
+            let vZoom = size.height / image.size.height
+            steadyStatePanOffset = .zero
+            steadyStateZoomScale = min(hZoom, vZoom)
+        }
     }
     
     private func position(for emoji: EmojiArt.Emoji, in size: CGSize) -> CGPoint {
@@ -85,6 +125,7 @@ struct ContentView: View {
         var location = emoji.location
         location = CGPoint(x: location.x * zoomScale, y: location.y * zoomScale)
         location = CGPoint(x: location.x + size.width/2, y: location.y + size.height/2)
+        location = CGPoint(x: location.x + panOffset.width, y: location.y + panOffset.height)
         
         return location
     }
@@ -92,7 +133,6 @@ struct ContentView: View {
     private func drop(_ providers: [NSItemProvider], at location: CGPoint) -> Bool {
         var found = providers.loadFirstObject(ofType: URL.self) { url in
             viewModel.setBackground(url)
-            print("dropped: \(url)")
         }
         
         if !found {
@@ -117,6 +157,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(viewModel: EmojiArtDocument())
     }
 }
-
-
-
