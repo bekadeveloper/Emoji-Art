@@ -44,10 +44,14 @@ struct ContentView: View {
                         )
                         .gesture(doubleTapToZoom(in: geometry.size))
                     
-                    ForEach(viewModel.emojis) { emoji in
-                        Text(emoji.text)
-                            .font(animatableWithSize: emoji.fontSize * zoomScale)
-                            .position(position(for: emoji, in: geometry.size))
+                    if isLoading {
+                        ProgressView()
+                    } else {
+                        ForEach(viewModel.emojis) { emoji in
+                            Text(emoji.text)
+                                .font(animatableWithSize: emoji.fontSize * zoomScale)
+                                .position(position(for: emoji, in: geometry.size))
+                        }
                     }
                 }
                 .clipped()
@@ -66,6 +70,10 @@ struct ContentView: View {
                 }
             }
         }
+    }
+    
+    private var isLoading: Bool {
+        return viewModel.backgroundURL != nil && viewModel.backgroundImage == nil
     }
     
     @State private var steadyStateZoomScale: CGFloat = 1.0
@@ -132,7 +140,7 @@ struct ContentView: View {
     
     private func drop(_ providers: [NSItemProvider], at location: CGPoint) -> Bool {
         var found = providers.loadFirstObject(ofType: URL.self) { url in
-            viewModel.setBackground(url)
+            viewModel.backgroundURL = url
         }
         
         if !found {
@@ -140,7 +148,6 @@ struct ContentView: View {
                 viewModel.addEmoji(string, at: location, size: defaultEmojiSize)
             }
         }
-        
         return found
     }
     

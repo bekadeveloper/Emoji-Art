@@ -45,9 +45,14 @@ class EmojiArtDocument: ObservableObject {
         model.emojis[index].size = Int((CGFloat(model.emojis[index].size) * scale).rounded(.toNearestOrEven))
     }
     
-    func setBackground(_ url: URL?) {
-        model.backgroundURL = url?.imageURL
-        fetchBackgroundImage()
+    var backgroundURL: URL? {
+        get {
+            model.backgroundURL
+        }
+        set {
+            model.backgroundURL = newValue?.imageURL
+            fetchBackgroundImage()
+        }
     }
     
     private func fetchBackgroundImage() {
