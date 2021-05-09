@@ -6,24 +6,29 @@
 //
 
 import SwiftUI
+import Combine
 
 class EmojiArtDocument: ObservableObject {
+    
     static let palette = "🚴🏻‍♂️🤺📔🗻🪂🏂🃏👨🏻‍💻📚"
     
     
     // MARK: - Acces to the model
-    @Published private var model: EmojiArt {
-        didSet {
-            UserDefaults.standard.setValue(model.json, forKey: "EmojiArtDocument.Untitled")
-        }
-    }
+    @Published private var model: EmojiArt
+    
+    private var autosaveCancellable: AnyCancellable?
     
     init() {
         model = EmojiArt(json: UserDefaults.standard.data(forKey: "EmojiArtDocument.Untitled")) ?? EmojiArt()
+        autosaveCancellable = $model.sink { emojiArt in
+            print("\(emojiArt.json?.utf8 ?? "nil")")
+            UserDefaults.standard.set(emojiArt.json, forKey: "EmojiArtDocument.Untitled")
+        }
         fetchBackgroundImage()
     }
     
     @Published private(set) var backgroundImage: UIImage?
+    
     var emojis: [EmojiArt.Emoji] { model.emojis }
     
     

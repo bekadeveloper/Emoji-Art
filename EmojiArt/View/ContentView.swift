@@ -58,6 +58,9 @@ struct ContentView: View {
                 .gesture(zoomGesture())
                 .gesture(panGesture())
                 .edgesIgnoringSafeArea([.horizontal, .bottom])
+                .onReceive(viewModel.$backgroundImage) { image in
+                    zoomToFit(image, in: geometry.size)
+                }
                 .onDrop(of: ["public.image", "public.text"], isTargeted: nil) { providers, location in
                     var location = CGPoint(x: location.x, y: geometry.convert(location, from: .global).y)
                     
