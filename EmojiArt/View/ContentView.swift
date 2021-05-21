@@ -9,19 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiArtDocument
+    @State private var chosenPalette: String = ""
     
     var body: some View {
         VStack {
             HStack {
+                PaletteChooser(viewModel: viewModel, chosenPalette: $chosenPalette)
                 ScrollView(.horizontal) {
                     HStack {
-                        ForEach(EmojiArtDocument.palette.map({ String($0) }), id: \.self) { emoji in
+                        ForEach(chosenPalette.map({ String($0) }), id: \.self) { emoji in
                             Text(emoji)
                                 .font(.system(size: defaultEmojiSize))
                                 .onDrag { NSItemProvider(object: emoji as NSString) }
                         }
                     }
                 }
+                .onAppear { chosenPalette = viewModel.defaultPalette }
                 
                 Button(action: viewModel.clearDocument) {
                     Text("Clear")
@@ -30,9 +33,8 @@ struct ContentView: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(7)
-                }
+                }.padding(.trailing)
             }
-            .padding(.horizontal)
             
             GeometryReader { geometry in
                 ZStack {
