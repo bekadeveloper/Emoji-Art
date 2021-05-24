@@ -22,9 +22,3 @@ struct PaletteChooser: View {
         .fixedSize(horizontal: true, vertical: false)
     }
 }
-
-struct PaletteChooser_Previews: PreviewProvider {
-    static var previews: some View {
-        PaletteChooser(viewModel: EmojiArtDocument(), chosenPalette: .constant(""))
-    }
-}

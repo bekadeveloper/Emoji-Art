@@ -10,11 +10,22 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiArtDocument
     @State private var chosenPalette: String = ""
+    @State private var chosenPaletteName: String = ""
+    @State private var showingPaletteEditor: Bool = false
     
     var body: some View {
         VStack {
             HStack {
                 PaletteChooser(viewModel: viewModel, chosenPalette: $chosenPalette)
+                
+                Button(action: { showingPaletteEditor.toggle() }) {
+                    Image(systemName: "keyboard").imageScale(.large)
+                }
+                .popover(isPresented: $showingPaletteEditor) {
+                    PaletteEditor(chosenPalette: $chosenPalette, chosenPaletteName: chosenPaletteName)
+                        .environmentObject(viewModel)
+                }
+                
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(chosenPalette.map({ String($0) }), id: \.self) { emoji in
@@ -25,6 +36,9 @@ struct ContentView: View {
                     }
                 }
                 .onAppear { chosenPalette = viewModel.defaultPalette }
+                .onChange(of: chosenPalette) { _ in
+                    chosenPaletteName = viewModel.paletteNames[chosenPalette] ?? ""
+                }
                 
                 Button(action: viewModel.clearDocument) {
                     Text("Clear")
