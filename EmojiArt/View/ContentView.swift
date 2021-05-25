@@ -29,13 +29,10 @@ struct ContentView: View {
                 .onAppear { chosenPalette = viewModel.defaultPalette }
                 
                 Button(action: viewModel.clearDocument) {
-                    Text("Clear")
-                        .bold()
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(7)
-                }.padding(.trailing)
+                    Image(systemName: "trash.fill")
+                        .imageScale(.large)
+                        .accentColor(.red)
+                }.padding()
             }
             
             GeometryReader { geometry in

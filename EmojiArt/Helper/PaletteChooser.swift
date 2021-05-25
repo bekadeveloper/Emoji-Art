@@ -24,7 +24,7 @@ struct PaletteChooser: View {
             Text(chosenPaletteName)
             
             Button(action: { showingPaletteEditor.toggle() }) {
-                Image(systemName: "keyboard")
+                Image(systemName: "square.and.pencil")
                     .imageScale(.large)
             }
             .sheet(isPresented: $showingPaletteEditor) {
