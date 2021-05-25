@@ -21,7 +21,7 @@ class EmojiArtDocument: ObservableObject {
     init() {
         model = EmojiArt(json: UserDefaults.standard.data(forKey: "EmojiArtDocument.Untitled")) ?? EmojiArt()
         autosaveCancellable = $model.sink { emojiArt in
-            print("\(emojiArt.json?.utf8 ?? "nil")")
+//            print("\(emojiArt.json?.utf8 ?? "nil")")
             UserDefaults.standard.set(emojiArt.json, forKey: "EmojiArtDocument.Untitled")
         }
         fetchBackgroundImage()
