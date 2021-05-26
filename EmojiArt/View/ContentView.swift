@@ -27,12 +27,6 @@ struct ContentView: View {
                     }
                 }
                 .onAppear { chosenPalette = viewModel.defaultPalette }
-                
-                Button(action: viewModel.clearDocument) {
-                    Image(systemName: "trash.fill")
-                        .imageScale(.large)
-                        .accentColor(.red)
-                }.padding()
             }
             
             GeometryReader { geometry in
@@ -74,6 +68,11 @@ struct ContentView: View {
                 }
             }
         }
+        .navigationBarItems(trailing:
+                                Button(action: { viewModel.backgroundURL = UIPasteboard.general.url }) {
+                                    Image(systemName: "doc.on.clipboard")
+                                }
+        )
     }
     
     private var isLoading: Bool {

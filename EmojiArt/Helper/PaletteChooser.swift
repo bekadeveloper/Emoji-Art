@@ -28,7 +28,7 @@ struct PaletteChooser: View {
                     .imageScale(.large)
             }
             .sheet(isPresented: $showingPaletteEditor) {
-                PaletteEditor(chosenPalette: $chosenPalette, showingPaletteEditor: $showingPaletteEditor, chosenPaletteName: chosenPaletteName)
+                PaletteEditor(chosenPalette: $chosenPalette, showingPaletteEditor: $showingPaletteEditor, chosenPaletteName: $chosenPaletteName)
             }
         }
         .fixedSize(horizontal: true, vertical: false)

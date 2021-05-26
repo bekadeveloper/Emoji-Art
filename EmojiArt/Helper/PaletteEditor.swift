@@ -11,7 +11,7 @@ struct PaletteEditor: View {
     @EnvironmentObject var viewModel: EmojiArtDocument
     @Binding var chosenPalette: String
     @Binding var showingPaletteEditor: Bool
-    @State var chosenPaletteName: String
+    @Binding var chosenPaletteName: String
     @State private var emojisToAdd: String = ""
     
     private static var gridItems = [GridItem(.adaptive(minimum: 60))]
@@ -33,9 +33,7 @@ struct PaletteEditor: View {
             Form {
                 Section {
                     TextField("Name", text: $chosenPaletteName, onEditingChanged: { began in
-                        if !began {
-                            viewModel.renamePalette(chosenPalette, to: chosenPaletteName)
-                        }
+                        viewModel.renamePalette(chosenPalette, to: chosenPaletteName)
                     })
                     
                     TextField("Add emoji", text :$emojisToAdd, onEditingChanged: { _ in
