@@ -13,7 +13,7 @@ struct DocumentStoreView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(store.documents, id: \.id) { document in
+                ForEach(store.documents) { document in
                     NavigationLink(destination: ContentView(viewModel: document).navigationBarTitle(Text(store.name(for: document)))) {
                         Text(store.name(for: document))
                     }

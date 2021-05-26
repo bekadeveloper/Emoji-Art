@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiArtDocument
     @State private var chosenPalette: String = ""
+    @State private var showAlert: Bool = false
     
     var body: some View {
         VStack {
@@ -69,9 +70,17 @@ struct ContentView: View {
             }
         }
         .navigationBarItems(trailing:
-                                Button(action: { viewModel.backgroundURL = UIPasteboard.general.url }) {
-                                    Image(systemName: "doc.on.clipboard")
-                                }
+                                Button(action: {
+                                    if let url = UIPasteboard.general.url {
+                                        viewModel.backgroundURL = url
+                                    } else {
+                                        showAlert.toggle()
+                                    }}) {
+                                        Image(systemName: "doc.on.clipboard")
+                                    }
+                                    .alert(isPresented: $showAlert) {
+                                        Alert(title: Text("No URL in the clipboard"))
+                                    }
         )
     }
     
@@ -79,11 +88,10 @@ struct ContentView: View {
         return viewModel.backgroundURL != nil && viewModel.backgroundImage == nil
     }
     
-    @State private var steadyStateZoomScale: CGFloat = 1.0
     @GestureState private var gestureZoomScale: CGFloat = 1.0
     
     private var zoomScale: CGFloat {
-        return steadyStateZoomScale * gestureZoomScale
+        return viewModel.steadyStateZoomScale * gestureZoomScale
     }
     
     private func zoomGesture() -> some Gesture {
@@ -92,15 +100,14 @@ struct ContentView: View {
                 gestureZoomScale = latestGestureScale
             }
             .onEnded { finalGestureScale in
-                steadyStateZoomScale *= finalGestureScale
+                viewModel.steadyStateZoomScale *= finalGestureScale
             }
     }
     
-    @State private var steadyStatePanOffset: CGSize = .zero
     @GestureState private var gesturePanOffset: CGSize = .zero
     
     private var panOffset: CGSize {
-        return (steadyStatePanOffset + gesturePanOffset) * zoomScale
+        return (viewModel.steadyStatePanOffset + gesturePanOffset) * zoomScale
     }
     
     private func panGesture() -> some Gesture {
@@ -109,7 +116,7 @@ struct ContentView: View {
                 gesturePanOffset = latestDragGestureValue.translation / zoomScale
             }
             .onEnded { finalDragGestureValue in
-                steadyStatePanOffset = steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
+                viewModel.steadyStatePanOffset = viewModel.steadyStatePanOffset + (finalDragGestureValue.translation / zoomScale)
             }
     }
     
@@ -126,8 +133,8 @@ struct ContentView: View {
         if let image = image, image.size.width > 0, image.size.height > 0 {
             let hZoom = size.width / image.size.width
             let vZoom = size.height / image.size.height
-            steadyStatePanOffset = .zero
-            steadyStateZoomScale = min(hZoom, vZoom)
+            viewModel.steadyStatePanOffset = .zero
+            viewModel.steadyStateZoomScale = min(hZoom, vZoom)
         }
     }
     
