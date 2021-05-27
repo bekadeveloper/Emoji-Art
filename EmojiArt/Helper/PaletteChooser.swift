@@ -27,7 +27,7 @@ struct PaletteChooser: View {
                 Image(systemName: "square.and.pencil")
                     .imageScale(.large)
             }
-            .sheet(isPresented: $showingPaletteEditor) {
+            .popover(isPresented: $showingPaletteEditor) {
                 PaletteEditor(chosenPalette: $chosenPalette, showingPaletteEditor: $showingPaletteEditor, chosenPaletteName: $chosenPaletteName)
             }
         }

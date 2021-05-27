@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiArtDocument
     @State private var chosenPalette: String = ""
-    @State private var showAlert: Bool = false
+    @State private var explainBackgroundPaste: Bool = false
+    @State private var confirmBackgroundPaste: Bool = false
     
     var body: some View {
         VStack {
@@ -67,19 +68,31 @@ struct ContentView: View {
                     
                     return drop(providers, at: location)
                 }
+                .alert(isPresented: $confirmBackgroundPaste) {
+                    Alert(title: Text("Paste Background"),
+                          message: Text("Replace your background with \(UIPasteboard.general.url?.absoluteString ?? "nothing")?"),
+                          primaryButton: .default(Text("OK")) {
+                            viewModel.backgroundURL = UIPasteboard.general.url
+                          },
+                          secondaryButton: .cancel())
+                }
             }
+            .zIndex(-1)
         }
         .navigationBarItems(trailing:
                                 Button(action: {
-                                    if let url = UIPasteboard.general.url {
-                                        viewModel.backgroundURL = url
+                                    if let url = UIPasteboard.general.url, url != viewModel.backgroundURL {
+                                        confirmBackgroundPaste.toggle()
                                     } else {
-                                        showAlert.toggle()
+                                        explainBackgroundPaste.toggle()
                                     }}) {
                                         Image(systemName: "doc.on.clipboard")
-                                    }
-                                    .alert(isPresented: $showAlert) {
-                                        Alert(title: Text("No URL in the clipboard"))
+                                            .alert(isPresented: $explainBackgroundPaste) {
+                                                Alert(title: Text("Paste Background"),
+                                                      message: Text("Copy the URL of an image to the clipboard and tap this button to make it the background of your document."),
+                                                      dismissButton: .default(Text("OK"))
+                                                )
+                                            }
                                     }
         )
     }
