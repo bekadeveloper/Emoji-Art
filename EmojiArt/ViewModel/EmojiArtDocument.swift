@@ -38,7 +38,25 @@ class EmojiArtDocument: ObservableObject, Hashable, Identifiable {
         }
         fetchBackgroundImage()
     }
+    
+    var url: URL?
+    
+    init(url: URL) {
+        id = UUID()
+        self.url = url
+        model = EmojiArt(json: try? Data(contentsOf: url)) ?? EmojiArt()
+        fetchBackgroundImage()
+        autosaveCancellable = $model.sink { emojiArt in
+            self.save(emojiArt)
+        }
+    }
         
+    private func save(_ emojiArt: EmojiArt) {
+        if url != nil {
+            try? emojiArt.json?.write(to: url!)
+        }
+    }
+    
     @Published private(set) var backgroundImage: UIImage?
     @Published var steadyStatePanOffset: CGSize = .zero
     @Published var steadyStateZoomScale: CGFloat = 1.0
